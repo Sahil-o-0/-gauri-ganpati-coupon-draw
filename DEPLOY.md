@@ -10,8 +10,8 @@ Tally PC  --connector.bat-->  https://gauri.dummysite.cloud/coupon-draw/  (websi
 ## 1. Get the code on the server
 
 ```bash
-git clone https://github.com/Sahil-o-0/-gauri-ganpati-coupon-draw.git
-cd -gauri-ganpati-coupon-draw      # if the shell treats the leading "-" as an option: cd ./-gauri-ganpati-coupon-draw
+git clone https://github.com/Sahil-o-0/-gauri-ganpati-coupon-draw.git gauri-draw
+cd gauri-draw
 bash deploy/install.sh
 ```
 
