@@ -114,11 +114,24 @@ async function dashboard() {
         <div class="muted">Last full check: ${when(t.last_full_at)} &middot; Last successful: ${when(t.last_ok_at)}</div>
         ${t.light === "red" ? `<div class="msg bad">${viaConn && !t.connector_online ? "The connector on the Tally PC has not been heard from since " + when(t.connector_last_seen) + ". Check that the PC is on, connector.bat is running and the internet works." : "The last checks failed. Make sure Tally is open on the Tally PC with the company loaded and the server connection on."} Sales are not lost: they are picked up as soon as it is back.</div>` : ""}
         ${t.light === "amber" && viaConn && !t.connector_last_seen ? '<div class="msg warn">The connector has not connected yet. Open <a href="#/tally">Tally setup</a> for the steps.</div>' : ""}
-        <div class="row" style="margin-top:10px"><button class="primary" id="sync" ${d.campaign.closed || t.running ? "disabled" : ""}>${t.running ? "Checking..." : "Sync now"}</button>
-        ${isAdmin() ? `<button id="full" ${d.campaign.closed ? "disabled" : ""}>Full check (also finds deleted bills)</button>` : ""}</div></div>
+        <div class="row" style="margin-top:10px"><button class="primary" id="sync" ${d.campaign.closed || t.running ? "disabled" : ""}>${t.running ? "Checking..." : "Sync now (last few days)"}</button>
+        ${isAdmin() ? `<button id="full" ${d.campaign.closed || t.running ? "disabled" : ""}>Import all bills since ${dmy(d.campaign.start)} (billing start)</button>` : ""}</div>
+        <div class="hint" style="margin-top:6px">Sync now picks up new and changed bills. The import reads every Sales bill from the billing start date to today, so older bills are brought in too, and bills deleted in Tally are found. It also runs by itself every hour.</div></div>
       <div class="card"><h2>Backup</h2><div>Last backup: <b>${when(d.backup.at)}</b></div><div class="muted">${esc(d.backup.note || "No backup yet. One is made every hour.")}</div></div>`);
-    $("#sync").onclick = guard(async () => { await api("/sync", "POST", { mode: "quick" }); toast("Checking Tally now..."); setTimeout(draw, 2500); });
-    if (isAdmin()) $("#full").onclick = guard(async () => { await api("/sync", "POST", { mode: "full" }); toast("Full check started..."); setTimeout(draw, 3500); });
+    const syncWait = guard(async (mode, label) => {
+      const before = d.tally.last.at;
+      $("#sync").disabled = true; if ($("#full")) $("#full").disabled = true;
+      await api("/sync", "POST", { mode });
+      toast(label + ": asking Tally, this can take up to a minute...");
+      for (let i = 0; i < 50; i++) {
+        await new Promise((r) => setTimeout(r, 3000));
+        const d2 = await api("/dashboard");
+        if (d2.tally.last.at !== before) { toast(d2.tally.last.message || "Done.", d2.tally.last.ok === false); break; }
+      }
+      draw();
+    });
+    $("#sync").onclick = () => syncWait("quick", "Sync");
+    if (isAdmin()) $("#full").onclick = () => syncWait("full", "Import");
   };
   await draw();
   state.timer = setInterval(() => draw().catch(() => {}), 15000);
