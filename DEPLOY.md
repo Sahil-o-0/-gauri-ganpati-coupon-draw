@@ -50,3 +50,11 @@ Log in as admin, open **Tally setup**, follow the three steps (turn on Tally's s
 - The app listens only on 127.0.0.1; only the web server in front is public.
 - Keep `connector.ini` private. **Make a new key** on the Tally setup page if it ever leaks.
 - Use a strong admin password and a key-based SSH login on the server.
+
+## This server (srv1389890)
+
+Ports 80/443 are held by the Caddy container `megha_caddy` (config: `/root/Meghasystemapp/Caddyfile`).
+`docker-compose.yml` therefore also joins the app to that stack's Docker network (`meghasystemapp_megha_network`) under the
+container name `gauri-coupon-draw`, so Caddy can reach it. Before editing that Caddyfile, copy it
+(`cp /root/Meghasystemapp/Caddyfile /root/Caddyfile.bak`) and check it with
+`docker exec megha_caddy caddy validate --config /etc/caddy/Caddyfile` before `docker exec megha_caddy caddy reload --config /etc/caddy/Caddyfile`.

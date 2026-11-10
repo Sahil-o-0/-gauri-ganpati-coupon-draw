@@ -3,6 +3,7 @@
 services:
   app:
     build: .
+    container_name: gauri-coupon-draw
     restart: unless-stopped
     environment:
       TZ: Asia/Kolkata
@@ -15,3 +16,12 @@ services:
       - ./data:/data
     ports:
       - "127.0.0.1:8080:8080"
+    networks:
+      - default
+      - webproxy
+
+# The web server that owns ports 80/443 on this server (the Caddy of the "megha" stack) must reach this app by name.
+networks:
+  webproxy:
+    external: true
+    name: meghasystemapp_megha_network
