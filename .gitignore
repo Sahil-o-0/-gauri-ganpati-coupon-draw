@@ -1,0 +1,10 @@
+data/
+backup/
+demo-data/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+tally_probe_output.xml
+probe-latest.xml

@@ -1,0 +1,7 @@
+# Only if NOTHING else uses ports 80/443 on the server: Caddy gets the HTTPS certificate by itself.
+gauri.dummysite.cloud {
+    redir /coupon-draw /coupon-draw/
+    handle_path /coupon-draw/* {
+        reverse_proxy 127.0.0.1:8080
+    }
+}

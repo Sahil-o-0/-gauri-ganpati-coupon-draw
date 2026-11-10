@@ -1,0 +1,5 @@
+# Add inside the existing  gauri.dummysite.cloud { ... }  block of your Caddyfile, then: caddy reload
+redir /coupon-draw /coupon-draw/
+handle_path /coupon-draw/* {
+    reverse_proxy 127.0.0.1:8080
+}

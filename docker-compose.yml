@@ -1,0 +1,17 @@
+# The lucky-draw website. It listens only on this server's own address (127.0.0.1:8080);
+# the web server in front of it (nginx or Caddy) publishes it at /coupon-draw/. See DEPLOY.md.
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Kolkata
+      LUCKYDRAW_DATA: /data/db
+      LUCKYDRAW_BACKUP: /data/backup
+      LUCKYDRAW_SOURCE: connector
+      LUCKYDRAW_BASE_PATH: ${BASE_PATH:-/coupon-draw}
+      LUCKYDRAW_PUBLIC_URL: ${PUBLIC_URL:-https://gauri.dummysite.cloud/coupon-draw}
+    volumes:
+      - ./data:/data
+    ports:
+      - "127.0.0.1:8080:8080"
